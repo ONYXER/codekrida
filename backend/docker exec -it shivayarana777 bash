@@ -1,0 +1,4 @@
+Script started on 2025-07-09 08:24:02+05:30 [COMMAND="/dev/null" TERM="xterm-256color" TTY="/dev/pts/1" COLUMNS="228" LINES="25"]
+bash: line 1: /dev/null: Permission denied
+
+Script done on 2025-07-09 08:24:02+05:30 [COMMAND_EXIT_CODE="126"]
