@@ -25,15 +25,24 @@ function  FileNode({node,setSelectedFile,containerName,selectedFile}) {
     const [expanded, setExpanded] = useState(false);
     const [children,setChildren] = useState(null);
     const[openCreateFile,setOpenCreateFile]=useState(false);
+    const [folderUpdated,setFolderUpdated]=useState(0);
 
 
     useEffect(()=>{
 
-        if(!expanded || node.type!=="folder"){
+        if(!expanded){
             return ;
         }
-        console.log(node);
-        axios.get(`http://localhost:8080/api/file/fileStructure?path=${node.path}`,{
+        let path = node.path;
+     if(node.type!=="folder"){
+
+         console.log(path);
+
+        path = path.slice(0,-(node.name.length+1));
+        console.log(path);
+
+     }
+        axios.get(`http://localhost:8080/api/file/fileStructure?path=${path}`,{
             withCredentials: true
         })
             .then(res => {
@@ -43,14 +52,44 @@ function  FileNode({node,setSelectedFile,containerName,selectedFile}) {
                 }
             })
             .catch(err => console.log(err));
-    },[expanded, node]);
+    },[expanded, node,folderUpdated]);
 
+    const Delete = async (data) =>{
+        axios.delete(`http://localhost:8080/api/file/deleteFolder`,{
+            data:data,
+            withCredentials: true
+        })
+            .then(res => {
+                if(res.status === 200){
+                    console.log(folderUpdated)
+                    setFolderUpdated(folderUpdated+1);
+                    console.log(folderUpdated)
+
+                    alert("Successfully deleted!");
+
+                }
+            })
+            .catch(err => console.log(err));
+    }
+    const rename = (data) =>{
+        axios.put(`http://localhost:8080/api/file/deleteFolder`,{
+            data:data,
+            withCredentials: true
+        })
+            .then(res => {
+                if(res.status === 200){
+                    setFolderUpdated(prev=>prev+1);
+                    alert("Successfully renamed!");
+                }
+            })
+            .catch(err => console.log(err));
+    }
 
 
     return(
      <>
 
-         {openCreateFile && <CreateFile node={node} setOpenCreateFile={setOpenCreateFile} containerName={containerName}/>}
+         <CreateFile node={node} setOpenCreateFile={setOpenCreateFile} containerName={containerName} setFolderUpdated={setFolderUpdated} openCreateFile={openCreateFile}/>
          <div className={"pl-1"}>
 
 
@@ -80,21 +119,21 @@ function  FileNode({node,setSelectedFile,containerName,selectedFile}) {
 
                           <ContextMenu.Item shortcut="⌘ F" onSelect={()=>{
                               // setAction(node,"newFolder")
-                              setExpanded(false);
+
                           }}>Folder</ContextMenu.Item>
 
                       </ContextMenu.SubContent>
                   </ContextMenu.Sub>}
                   <ContextMenu.Item shortcut="⌘ E" onSelect={()=>{
                       // setAction(node,"rename")
-                      setExpanded(false);
+
                   }}>Rename</ContextMenu.Item>
 
 
                   <ContextMenu.Separator />
                   <ContextMenu.Item shortcut="⌘ ⌫" color="red" onSelect={()=>{
-                      // setAction(node,"delete")
-                      setExpanded(false);
+                      Delete({containerName: containerName, path: node.path}).then(r  =>r);
+                      setExpanded(true);
                   }}>Delete
 
                   </ContextMenu.Item>
@@ -104,7 +143,7 @@ function  FileNode({node,setSelectedFile,containerName,selectedFile}) {
          {expanded && children && (
              <div className="pl-4">
                  {children.filter(child=>child.path ===node.path+"/"+child.name).map((child) => (
-                     <FileNode node={child} key={child.path}  containerName={containerName} setSelectedFile={setSelectedFile} selectedFile={selectedFile}/>))}
+                     <FileNode node={child} key={child.path}  containerName={containerName} setSelectedFile={setSelectedFile} selectedFile={selectedFile}/>)).filter(Boolean)};
 
              </div>
          )}

@@ -1,4 +1,4 @@
-import {Box, Button,Avatar} from '@radix-ui/themes'
+import {Box, Button} from '@radix-ui/themes'
 import {FaPlay, FaTerminal, FaWindowMaximize,FaWindowMinimize,FaWindowClose, FaFolder, FaFolderOpen,FaMinus} from "react-icons/fa";
 import {Panel,PanelGroup,PanelResizeHandle} from "react-resizable-panels";
 import UserProfile from "./components/UserProfile";

@@ -8,7 +8,7 @@ import axios from "axios";
 
 
 
-export default function CreateFile({node,setOpenCreateFile,containerName}) {
+export default function CreateFile({node,setOpenCreateFile,containerName,setFolderUpdated,openCreateFile}) {
 
    const [loading, setLoading] = React.useState(false);
 
@@ -25,24 +25,22 @@ export default function CreateFile({node,setOpenCreateFile,containerName}) {
            })
                 .then(response => {
                     if(response.status === 200){
+                        setFolderUpdated(prev=>prev+1);
                         alert("Successfully created!");
+                        setOpenCreateFile(false);
+
                     }
                 })
                 .catch(() => {
                     alert("failed to create file");
                 })
                 .finally(() => {setLoading(false);});
-        // axios.get(`http://localhost:8080/api/file/fileStructure?path=${node.path}`, {
-        //     withCredentials: true,
-        // })
-        //     .then(response =>{
-        //         console.log(response.data);
-        //     })
+
 
     }
     return (
 
-        <Dialog.Root open>
+        <Dialog.Root open = {openCreateFile}>
 
             <Dialog.Content maxWidth="450px">
 
