@@ -23,12 +23,15 @@ public class FileController {
     @PostMapping("/createFile")
     public ResponseEntity<?> createFile(@RequestBody FileRequest request){
           return fileService.createFile(request);
+
     }
+    @CrossOrigin
     @PostMapping("/createFolder")
     public ResponseEntity<?> createFolder(@RequestBody FileRequest request){
         return  fileService.createFolder(request);
     }
 
+    @CrossOrigin
     @PutMapping("/renameOrMove")
     public ResponseEntity<?> renameOrMove(@RequestBody FileRequest request){
         return fileService.renameOrMoveFileOrFolder(request);
@@ -37,19 +40,22 @@ public class FileController {
     public ResponseEntity<?> deleteFile(@RequestBody FileRequest request){
         return fileService.deleteFile(request);}
 
+    @CrossOrigin
     @DeleteMapping("/deleteFolder")
     public ResponseEntity<?> deleteFolder(@RequestBody FileRequest request){
         return fileService.deleteFolder(request);
     }
-
+     @CrossOrigin
     @GetMapping("/getContent")
     public String getContent(@RequestParam String containerName, @RequestParam String path){
         return fileService.readFileContentFromContainer(containerName,path);
     }
+    @CrossOrigin
     @PutMapping("/writeContent")
     public ResponseEntity<?> writeContent(@RequestBody WriteFileContent content){
        return fileService.writeFileContentToContainer(content);
     }
+    @CrossOrigin
     @GetMapping("fileStructure")
     public ResponseEntity<List<Map<String,String>>> getFileStructure(@RequestParam String path){
 

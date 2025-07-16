@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,7 +139,8 @@ private final String BASE_WORKSPACE = "/user";
         if(checkExistContainer(containerName) && !checkContainerRunning(containerName)){
             startContainer(containerName);
         }
-        ProcessBuilder builder = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c" ,"touch "+path);
+        String command = "touch \""+path+"\"";
+        ProcessBuilder builder = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c" ,command);
         Process process = builder.start();
         int exit = process.waitFor();
         if(exit != 0){
@@ -150,7 +152,8 @@ private final String BASE_WORKSPACE = "/user";
          if(checkExistContainer(containerName) && !checkContainerRunning(containerName)){
              startContainer(containerName);
          }
-         int exit  = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c","rm "+path).start().waitFor();
+         String command = "rm \""+path+"\"";
+         int exit  = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c",command).start().waitFor();
 
          if(exit != 0){
              throw  new RuntimeException("failed to delete file");
@@ -158,16 +161,18 @@ private final String BASE_WORKSPACE = "/user";
 
      }
      public  void createFolder(String containerName,String path) throws  IOException,InterruptedException{
-
-
-        int exit = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c"," mkdir "+path).start().waitFor();
+         if(checkExistContainer(containerName) && !checkContainerRunning(containerName)){
+             startContainer(containerName);
+         }
+         String command = "mkdir \""+path+"\"";
+        int exit = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c",command).start().waitFor();
          if(exit != 0){
              throw  new RuntimeException("failed to create folder");
          }
      }
      public void removeFolder(String containerName,String path) throws IOException,InterruptedException{
-
-        int exit = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c","rm -r "+path).start().waitFor();
+         String command = "rm -r \""+path+"\"";
+        int exit = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c",command).start().waitFor();
          if(exit != 0){
              throw  new RuntimeException("failed to delete  folder");
          }
@@ -177,8 +182,8 @@ private final String BASE_WORKSPACE = "/user";
 
 
         if(checkContainerRunning(containerName)){
-
-            int exit = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c","mv "+oldPath+" "+newPath).start().waitFor();
+            String command = "mv \""+oldPath+"\" "+"\""+newPath+"\"";
+            int exit = new ProcessBuilder("docker","exec","-i",containerName,"bash","-c",command).start().waitFor();
             if(exit != 0){
                 throw  new Exception("failed to renameOrRemoveFIleOrFolder  folder");
             }
@@ -195,11 +200,11 @@ private final String BASE_WORKSPACE = "/user";
 
                 if(auth == null) return  fileList;
             String containerName = ((User)auth.getPrincipal()).getWorkspaceName();
-
+            String command = "find \""+path+"\" -printf  \"%p|%f|%y\\n\"";
 
 
 //        build the docker exec command
-            ProcessBuilder builder = new ProcessBuilder("docker","exec","-i",containerName,"bash", "-c","find "+path+" -printf  \"%p|%f|%y\\n\"");
+            ProcessBuilder builder = new ProcessBuilder("docker","exec","-i",containerName,"bash", "-c",command);
             builder.redirectErrorStream(true);
             Process process = builder.start();
 
